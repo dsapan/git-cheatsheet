@@ -1,0 +1,31 @@
+Creating a local repository
+1- git init
+
+Adding files into staging area
+2-git add --a
+  git add "abc.txt"
+
+Checking the untracked files
+3- git status 
+
+Adding all the files in staging area into local repository
+4- git commit -m "message"
+
+Matching the current repository with last commit
+5- git checkout "abc.txt"
+   git checkout -f
+
+checking information about all the commits
+6-git log
+
+Compares current working directory with staging area
+7-git diff
+
+Adding all the files into remote repository from local repository
+8-git push -u origin master 
+
+Copying the any repo from github into local machine
+9- git clone url
+
+Fetching all the changes in the files from remote repository into local repository
+10- git pull url

@@ -1,0 +1,177 @@
+
+"""# Exp 6"""
+
+text = '''He said sorry. I said okay. He said New Delhi. I said New Mumbai.'''
+bigrams = []
+words = []
+sent_text = nltk.sent_tokenize(text)
+for sentence in sent_text:
+    tokenized_text = nltk.word_tokenize(sentence)
+    tokens = list(filter(lambda tok: tok not in string.punctuation, tokenized_text))
+    tokens = list(x.lower() for x in tokens)
+    tokens = ['<s>'] + tokens + ['</s>']
+    words.extend(tokens)
+    for i in range(len(tokens)-1):
+        bigrams.append((tokens[i], tokens[i+1]))
+
+from collections import Counter
+
+words_freq = Counter(words)
+bigrams_freq = Counter(bigrams)
+
+print(f'{" "*6}|', end='')
+print("|".join([f"{word:^6}" for word in words_freq.keys()]))
+print(f'{"-"*6}|' * (1+len(words_freq.keys())), end="")
+
+for word_row in words_freq.keys():
+    print(f'\n{word_row:^6}|', end='')
+    for word_col in words_freq.keys():
+        print(f'{bigrams_freq[(word_row, word_col)]:^6}', end="|")
+
+from collections import defaultdict
+bigram_prob = defaultdict(int)
+
+for gram in bigrams_freq.keys():
+    bigram_prob[gram] = bigrams_freq[gram] / words_freq[gram[0]]
+
+print(f'{" "*6}|', end='')
+print("|".join([f"{word:^6}" for word in words_freq.keys()]))
+print(f'{"-"*6}|' * (1+len(words_freq.keys())), end="")
+
+for word_row in words_freq.keys():
+    print(f'\n{word_row:^6}|', end='')
+    for word_col in words_freq.keys():
+        print(f'{bigram_prob[(word_row, word_col)]:^6}', end="|")
+
+"""# Exp 7"""
+
+import nltk
+from nltk.tokenize import sent_tokenize
+from nltk.tokenize import word_tokenize
+from collections import Counter
+
+text = '''Marry Jane can see Will.
+Spot will see Mary.
+Will Jane spot Mary?
+Mary will pat Spot.'''
+
+tagged_sents = []
+tags = []
+tags_pair = []
+
+for sent in sents:
+    words = word_tokenize(sent)
+    words = list(filter(lambda tok: tok not in string.punctuation, words))
+    words = list(x.lower() for x in words)
+
+    tagged_words = nltk.pos_tag(words)
+    tagged_sents.extend(tagged_words)
+
+    tag = ['<s>'] + [t[1] for t in tagged_sents] + ['</s>']
+    tags.extend(tag)
+
+    for i in range(len(tag) - 1):
+        tags_pair.append((tag[i], tag[i+1]))
+
+tags_freq = Counter(tags)
+tags_pair_freq = Counter(tags_pair)
+word_tag_freq = Counter(tagged_sents)
+word_freq = Counter(word for word, tag in tagged_sents)
+
+tags_without_s = list({tag for word, tag in tagged_sents})
+words = list({word for word, tag in tagged_sents})
+
+"""Emission"""
+
+print(f'{"Words":^6}|', end="")
+print("|".join(f"{t:^6}" for t in tags_without_s))
+
+for word in words:
+    print(f'\n{word:^6}|', end='')
+    for tag in tags_without_s:
+        print(f"{word_tag_freq[(word, tag)]:^6}|", end="")
+
+print(f'{"Words":^6}|', end="")
+print("|".join(f"{t:^6}" for t in tags_without_s))
+
+for word in words:
+    print(f'\n{word:^6}|', end='')
+    for tag in tags_without_s:
+        print(f"{word_tag_freq[(word, tag)] / word_freq[word]:^6.2f}|", end="")
+
+"""Transition"""
+
+print(f'{"Words":^6}|', end="")
+print("|".join(f"{t:^6}" for t in tags_freq.keys()))
+
+for tag_row in tags_freq.keys():
+    print(f'\n{tag_row:^6}|', end='')
+    for tag_col in tags_freq.keys():
+        print(f"{tags_pair_freq[(tag_row, tag_col)]:^6}|", end="")
+
+print(f'{"Words":^6}|', end="")
+print("|".join(f"{t:^6}" for t in tags_freq.keys()))
+
+for tag_row in tags_freq.keys():
+    print(f'\n{tag_row:^6}|', end='')
+    for tag_col in tags_freq.keys():
+        print(f"{tags_pair_freq[(tag_row, tag_col)] / tags_freq[tag_row]:^6.2f}|", end="")
+
+"""# Exp 8"""
+
+from nltk.corpus import stopwords
+
+sent = "The red maple leaves blew from the tree"
+stop_words = set(stopwords.words('english'))
+
+words = word_tokenize(sent)
+filtered_words = [w.lower() for w in words if not w.lower() in stop_words]
+filtered_words
+
+from nltk import pos_tag
+tagged = pos_tag(filtered_words)
+tagged
+
+tagged
+
+from nltk import RegexpParser
+
+grammar = "NP: {<VB|VBD|VBP>?<JJ>*<NN>} # NP"
+chunkParser = RegexpParser(grammar)
+tree = chunkParser.parse(tagged)
+
+for subtree in tree.subtrees():
+    print(subtree)
+
+tree.draw()
+
+import svgling
+svgling.draw_tree(tree)
+
+"""# Exp 9"""
+
+from nltk import ne_chunk
+from nltk import word_tokenize
+# from nltk.corpus import stopwords
+# stopwords = set(stopwords.words("english"))
+
+sent = '''Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England, that competes in the Premier League, the top flight of English football. Nicknamed the Red Devils, the club was founded as Newton Heath LYR Football Club in 1878, but changed its name to Manchester United in 1902. The club moved from Newton Heath to its current stadium, Old Trafford, in 1910. Manchester United have won the joint-record number of trophies in English club football, including a record 20 League titles, 12 FA Cups, five League Cups and a record 21 FA Community Shields.'''
+tokens = word_tokenize(sent)
+# tokens = [token for token in tokens if token not in string.punctuation]
+# tokens = [token for token in tokens if token not in stopwords]
+
+from nltk import pos_tag
+tags = pos_tag(tokens)
+
+for chunk in ne_chunk(tags):
+    # print(chunk)
+    if hasattr(chunk, 'label'):
+        print(chunk.label(), ' '.join(c[0] for c in chunk))
+
+import spacy
+
+import en_core_web_sm
+nlp = en_core_web_sm.load()
+doc = nlp('Manchester United Football Club is a professional football club based in Old Trafford, Greater Manchester, England, that competes in the Premier League, the top flight of English football. Nicknamed the Red Devils, the club was founded as Newton Heath LYR Football Club in 1878, but changed its name to Manchester United in 1902. The club moved from Newton Heath to its current stadium, Old Trafford, in 1910. Manchester United have won the joint-record number of trophies in English club football, including a record 20 League titles, 12 FA Cups, five League Cups and a record 21 FA Community Shields.')
+l1 = list([(X.text, X.label_) for X in doc.ents])
+print(*l1, sep = "\n")

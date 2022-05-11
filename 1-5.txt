@@ -1,0 +1,53 @@
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+
+text = input("Enter Paragraph: \n")
+# text_token = word_tokenize(text)
+# print("\n Word Tokenization:\n ")
+# print(text_token)
+
+punc = '''~`!@#$%^&*()-_=+[]{}';:"/.,<>?\|'''
+
+for ele in text:
+    if ele in punc:
+        text = text.replace(ele,"")
+
+print("\nRemoval of punctuations:\n")
+print(text)
+
+stop_words = stopwords.words()
+
+text_tokens = word_tokenize(text)
+print("\n Word Tokenization: \n")
+print(text_tokens)
+
+filtered_sent = [w for w in text_tokens if w not in stop_words]
+print("\n Filtered Sentence: \n")
+print(filtered_sent)
+
+ps = PorterStemmer()
+print("\n Stemming:\n ")
+for w in filtered_sent:
+    print(w, ":", ps.stem(w))
+
+print("\n Lemmetization:\n ")
+lemmetization = WordNetLemmatizer()
+tags = ['n','v','a']
+
+for w in filtered_sent:
+    lemma = []
+    for tag in tags:
+        lemma.append(lemmetization.lemmatize(w,tag))
+    print(w, "-->", lemma)
+
+print("\n Morphological Analysis:\n")
+pos = nltk.pos_tag(text_tokens)
+print(pos)
+
+for w,k in zip(filtered_sent, pos):
+    print(w, ":" , lemmetization.lemmatize(w), ":", k[1])
+
+
